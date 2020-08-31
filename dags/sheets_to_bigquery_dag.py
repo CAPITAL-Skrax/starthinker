@@ -51,6 +51,8 @@ USER_CONN_ID = "starthinker_user" # The connection to use for user authenticatio
 GCP_CONN_ID = "starthinker_service" # The connection to use for service authentication.
 
 INPUTS = {
+  'auth_read': 'user',  # Credentials used for reading data.
+  'auth_write': 'service',  # Credentials used for writing data.
   'sheets_url': '',
   'sheets_tab': '',
   'sheets_range': '',
@@ -62,12 +64,20 @@ INPUTS = {
 TASKS = [
   {
     'sheets': {
-      'auth': 'user',
+      'auth': {
+        'field': {
+          'name': 'auth_read',
+          'kind': 'authentication',
+          'order': 0,
+          'default': 'user',
+          'description': 'Credentials used for reading data.'
+        }
+      },
       'sheet': {
         'field': {
           'name': 'sheets_url',
           'kind': 'string',
-          'order': 1,
+          'order': 2,
           'default': ''
         }
       },
@@ -75,7 +85,7 @@ TASKS = [
         'field': {
           'name': 'sheets_tab',
           'kind': 'string',
-          'order': 2,
+          'order': 3,
           'default': ''
         }
       },
@@ -83,7 +93,7 @@ TASKS = [
         'field': {
           'name': 'sheets_range',
           'kind': 'string',
-          'order': 3,
+          'order': 4,
           'default': ''
         }
       },
@@ -96,13 +106,21 @@ TASKS = [
         }
       },
       'out': {
-        'auth': 'service',
+        'auth': {
+          'field': {
+            'name': 'auth_write',
+            'kind': 'authentication',
+            'order': 1,
+            'default': 'service',
+            'description': 'Credentials used for writing data.'
+          }
+        },
         'bigquery': {
           'dataset': {
             'field': {
               'name': 'dataset',
               'kind': 'string',
-              'order': 7,
+              'order': 5,
               'default': ''
             }
           },
@@ -110,7 +128,7 @@ TASKS = [
             'field': {
               'name': 'table',
               'kind': 'string',
-              'order': 8,
+              'order': 6,
               'default': ''
             }
           }

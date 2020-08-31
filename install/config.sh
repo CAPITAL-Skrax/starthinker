@@ -34,7 +34,7 @@ STARTHINKER_WORKER_JOBS=4
 STARTHINKER_ANALYTICS="UA-167283455-2"
 
 STARTHINKER_PROJECT=""
-STARTHINKER_ZONE="us-west1-b"
+STARTHINKER_ZONE="us-west2-b"
 
 STARTHINKER_UI_PRODUCTION_DOMAIN=""
 STARTHINKER_UI_PRODUCTION_SECRET=""
@@ -307,6 +307,32 @@ setup_database() {
 }
 
 
+setup_analytics() {
+
+  echo ""
+  echo "----------------------------------------"
+  echo "Set Analytics Tracking - ${STARTHINKER_ANALYTICS}"
+  echo "----------------------------------------"
+  echo ""
+  echo "All data collected is anonymous and never shared outside of the StarThinker team."
+  echo "Leaving the tracking in place helps us continue supporting StarThinker by showing it is useful."
+  echo "To opt out simply enter a blank or type in your own."
+  echo ""
+  
+  read -p "Google Analytics Token ( blank to leave unchanged or OFF to remove): " analytics
+
+  if [ "$analytics" == "OFF" ]; then
+    STARTHINKER_ANALYTICS="";
+  elif [ ! -z "${analytics}" ]; then
+    STARTHINKER_ANALYTICS=$analytics;
+  fi
+
+  echo ""
+  echo "Done"
+  echo ""
+}
+
+
 setup_project() {
   forced=$1
 
@@ -367,8 +393,7 @@ setup_credentials_commandline() {
     fi
 
     echo "  C. For Application Name enter: StarThinker"
-    echo "  D. In Authorised domains, type $(gcloud app browse --no-launch-browser) and press Enter."
-    echo "  E. All other fields are optional, click Save."
+    echo "  D. All other fields are optional, click Save."
     echo ""
 
     echo "Step 2: Setup Credentials ( do only once )"
@@ -381,8 +406,9 @@ setup_credentials_commandline() {
 
     echo "Step 3: Enter Credentials ( do only once )"
     echo "----------------------------------------"
-    echo "  A. Find your key under OAuth 2.0 Client IDs and click download arrow."
-    echo "  B. Paste credentials JSON below, then press return ( if return does not work press CTRL + D ):"
+    echo "  A. Visit: https://console.developers.google.com/apis/credentials"
+    echo "  B. Find your key under OAuth 2.0 Client IDs and click download arrow."
+    echo "  C. Paste credentials JSON below, then press return ( if return does not work press CTRL + D ):"
     echo ""
 
     read_multiline "}}"
@@ -410,6 +436,11 @@ setup_credentials_ui() {
 
   if [ "$forced" == "forced" ] || [ ! -f "$STARTHINKER_CLIENT_WEB" ]; then
 
+    values=$(gcloud app describe --format="value(name)" --verbosity=none)
+    if [ -z "${values}" ]; then
+      gcloud app create --region "${STARTHINKER_REGION}"
+    fi
+
     echo "Step 1: Configure Consent Screen ( do only once )"
     echo "----------------------------------------"
     echo "  A. Visit: https://console.developers.google.com/apis/credentials/consent"
@@ -421,7 +452,7 @@ setup_credentials_ui() {
     fi
 
     echo "  C. For Application Name enter: StarThinker"
-    echo "  D. In Authorised domains, type $(gcloud app browse --no-launch-browser) and press Enter."
+    echo "  D. In Authorized domains, type $(gcloud app browse --no-launch-browser) and press Enter."
     echo "  E. All other fields are optional, click Save."
     echo ""
 
@@ -438,8 +469,9 @@ setup_credentials_ui() {
 
     echo "Step 3: Enter Credentials ( do only once )"
     echo "----------------------------------------"
-    echo "  A. Find your key under OAuth 2.0 Client IDs and click download arrow."
-    echo "  B. Paste credentials JSON below, then press return ( if return does not work press CTRL + D ):"
+    echo "  A. Visit: https://console.developers.google.com/apis/credentials"
+    echo "  B. Find your key under OAuth 2.0 Client IDs and click download arrow."
+    echo "  C. Paste credentials JSON below, then press return ( if return does not work press CTRL + D ):"
     echo ""
 
     read_multiline "}}"
@@ -518,7 +550,7 @@ setup_credentials_user() {
   echo ""
 
   source "${STARTHINKER_ROOT}/starthinker_assets/development.sh";
-  python "${THIS_DIR}/starthinker/auth/helper.py" -c "${STARTHINKER_CLIENT_INSTALLED}" -u "${STARTHINKER_USER}"
+  python3 "${THIS_DIR}/starthinker/auth/helper.py" -c "${STARTHINKER_CLIENT_INSTALLED}" -u "${STARTHINKER_USER}"
   deactivate
 
   echo ""
@@ -570,12 +602,12 @@ install_virtualenv_darwin() {
     return
   else
     if [[ -z $VIRTUAL_ENV ]]; then
-      pip3 install pip --upgrade --quiet --user;
+      python3 -m pip install pip --upgrade --quiet --user;
     fi
   fi
 
   if [ "$(command -v virtualenv)" == "" ]; then
-    pip3 install virtualenv --quiet --user;
+    python3 -m pip install virtualenv --quiet --user;
   fi
 
 }
@@ -628,7 +660,7 @@ install_requirements() {
 
   source "${STARTHINKER_ENV}/bin/activate"
   python3 -m pip install --upgrade pip
-  pip3 install -r ${STARTHINKER_ROOT}/requirements.txt --quiet
+  python3 -m pip install install -r ${STARTHINKER_ROOT}/requirements.txt --quiet
   deactivate
 
   echo ""

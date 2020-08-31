@@ -8,8 +8,8 @@
     "description":"Gives CM clients ability to see which profiles have access to which parts of an account. Loads CM user profile mappings using the API into BigQuery and connects to a DataStudio dashboard.",
     "image":"https://storage.googleapis.com/starthinker-ui/barnacle.png",
     "sample":"https://datastudio.google.com/open/1gjxHm0jUlQUd0jMuxaOlmrl8gOX1kyKT",
-    "categories":["security", "solution", "covid"],
-    "requirements":[ "cm", "datastudio", "bigquery" ],
+    "from":["cm"],
+    "to":["datastudio", "bigquery" ],
     "pitches":[
       "Meet contractual access reporting information.",
       "Reduce unauthorized use of CM accounts and assets.",
@@ -24,8 +24,8 @@
       "csat improvement":90
     },
     "instructions":[
-      "Wait for <b>BigQuery->{field:recipe_project}->{field:dataset}->CM_*</b> to be created.",
-      "Wait for <b>BigQuery->{field:recipe_project}->{field:dataset}->Barnacle_*</b> to be created, then copy and connect the following data sources.",
+      "Wait for <b>BigQuery->{field:recipe_project}->{field:recipe_slug}->CM_*</b> to be created.",
+      "Wait for <b>BigQuery->{field:recipe_project}->{field:recipe_slug}->Barnacle_*</b> to be created, then copy and connect the following data sources.",
       "Join the <a hre='https://groups.google.com/d/forum/starthinker-assets' target='_blank'>StarThinker Assets Group</a> to access the following assets",
       "Copy <a href='https://datastudio.google.com/open/1a6K-XdPUzCYRXZp1ZcmeOUOURc9wn2Jj' target='_blank'>Barnacle Profile Advertiser Map</a> and connect.",
       "Copy <a href='https://datastudio.google.com/open/1NEzrQWWnPjkD90iUwN-ASKbVBzoeBdoT' target='_blank'>Barnacle Profile Campaign Map</a> and connect.",
@@ -48,45 +48,29 @@
   },
   "tasks":[
     { "dataset":{
-      "description":"The dataset will hold multiple tables, amke sure it exists.",
+      "description":"The dataset will hold multiple tables, make sure it exists.",
       "hour":[1],
-      "auth":"service",
-      "dataset":{"field":{ "name":"dataset", "kind":"string", "order":1, "default":"", "description":"Name of Google BigQuery dataset to create." }}
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
+      "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "order":4, "default":"", "description":"Name of Google BigQuery dataset to create." }}
     }},
     { "barnacle":{
       "description":"Will create tables with format CM_* to hold each endpoint via a call to the API list function. Exclude reports for its own task.",
       "hour":[1],
-      "auth":"user",
-      "endpoints":["accounts", "subaccounts", "profiles", "advertisers", "campaigns", "sites", "roles"],
-      "reports":false,
-      "accounts":{
-        "single_cell":true,
-        "values":{"field":{ "name":"accounts", "kind":"integer_list", "order":2, "default":[], "description":"Comma separated CM account ids." }}
-      },
-      "out":{
-        "auth":"service",
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "order":1, "default":"", "description":"Google BigQuery dataset to create tables in." }}
-      }
-    }},
-    { "barnacle":{
-      "description":"Will create tables with format CM_* to hold each endpoint via a call to the API list function. Reports run long so seperate task.",
-      "hour":[3],
-      "auth":"user",
-      "endpoints":[],
+      "auth":{"field":{ "name":"auth_read", "kind":"authentication", "order":0, "default":"user", "description":"Credentials used for reading data." }},
       "reports":{"field":{ "name":"reports", "kind":"boolean", "order":3, "default":false, "description":"Include report audit, consumes significant API and data." }},
       "accounts":{
         "single_cell":true,
         "values":{"field":{ "name":"accounts", "kind":"integer_list", "order":2, "default":[], "description":"Comma separated CM account ids." }}
       },
       "out":{
-        "auth":"service",
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "order":1, "default":"", "description":"Google BigQuery dataset to create tables in." }}
+        "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "order":4, "default":"", "description":"Google BigQuery dataset to create tables in." }}
       }
     }},
     {"bigquery":{
       "hour":[8],
       "description":"Combine profile, account, subaccount, and roles into one view, used by other views in this workflow.",
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -123,24 +107,24 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_SubAccounts` AS S
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profile_Role_Account_SubAccount_Map"
       }
     }},
     {"bigquery":{
       "description":"Combine profiles and advertisers.",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -160,22 +144,22 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_Advertisers` AS A
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profile_Advertiser_Map"
       }
     }},
     {"bigquery":{
       "description":"Profile to campaign mapping.",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -195,22 +179,22 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_Campaigns` AS C
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profile_Campaign_Map"
       }
     }},
     {"bigquery":{
       "description":"The logic query for Deal Finder, transforms report into view used by datastudio.",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -231,20 +215,20 @@ LEFT JOIN `[PARAMETER].[PARAMETER].Barnacle_Profile_Role_Account_SubAccount_Map`
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profile_Report_Map"
       }
     }},
     {"bigquery":{
       "description":"The logic query for Deal Finder, transforms report into view used by datastudio.",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -263,22 +247,22 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_Sites` AS S
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profile_Site_Map"
       }
     }},
     {"bigquery":{
       "description":"The logic query for Deal Finder, transforms report into view used by datastudio.",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -299,24 +283,24 @@ WHERE
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Profiles_Connections"
       }
     }},
     {"bigquery":{
       "description":"",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -344,26 +328,26 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_Reports` AS R
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Report_Delivery_Profiles"
       }
     }},
     {"bigquery":{
       "description":"",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -387,24 +371,24 @@ WHERE roleId NOT IN (
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Roles_Not_Used"
       }
     }},
     {"bigquery":{
       "description":"",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -435,26 +419,26 @@ LEFT JOIN `[PARAMETER].[PARAMETER].CM_Sites` AS S
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Site_Contacts_Profiles"
       }
     }},
     {"bigquery":{
       "description":"",
       "hour":[8],
-      "auth":"service",
+      "auth":{"field":{ "name":"auth_write", "kind":"authentication", "order":1, "default":"service", "description":"Credentials used for writing data." }},
       "from":{
         "legacy":false,
         "query":"
@@ -519,17 +503,17 @@ WHERE PFL.roleId != PFR.roleId
 ",
         "parameters":[
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
           {"field":{ "name":"recipe_project", "kind":"string", "description":"Project where BigQuery dataset will be created." }},
-          {"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
+          {"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }}
         ]
       },
       "to":{
-        "dataset":{"field":{ "name":"dataset", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
+        "dataset":{"field":{ "name":"recipe_slug", "kind":"string", "description":"Place where tables will be written in BigQuery." }},
         "view":"Barnacle_Roles_Duplicates"
       }
     }}

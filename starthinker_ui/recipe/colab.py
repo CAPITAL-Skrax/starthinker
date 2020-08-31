@@ -59,8 +59,9 @@ def script_to_colab(name, description, instructions, tasks, parameters={}):
   colab.code('')
 
   if fields: colab.code('json_set_fields(TASKS, FIELDS)')
+  colab.code('')
 
-  colab.code("project.initialize(_recipe={ 'tasks':TASKS }, _project=CLOUD_PROJECT, _user=USER_CREDENTIALS, _client=CLIENT_CREDENTIALS, _verbose=True)")
-  colab.code('project.execute()')
+  colab.code("project.initialize(_recipe={ 'tasks':TASKS }, _project=CLOUD_PROJECT, _user=USER_CREDENTIALS, _client=CLIENT_CREDENTIALS, _verbose=True, _force=True)")
+  colab.code('project.execute(_force=True)')
 
   return colab.render()

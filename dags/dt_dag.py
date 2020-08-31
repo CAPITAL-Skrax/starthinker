@@ -51,6 +51,8 @@ USER_CONN_ID = "starthinker_user" # The connection to use for user authenticatio
 GCP_CONN_ID = "starthinker_service" # The connection to use for service authentication.
 
 INPUTS = {
+  'auth_read': 'user',  # Credentials used for reading data.
+  'auth_write': 'service',  # Credentials used for writing data.
   'bucket': '',  # Name of bucket where DT files are stored.
   'paths': [],  # List of prefixes to pull specific DT files.
   'days': 2,  # Number of days back to synchronize.
@@ -61,13 +63,21 @@ INPUTS = {
 TASKS = [
   {
     'dt': {
-      'auth': 'user',
+      'auth': {
+        'field': {
+          'name': 'auth_read',
+          'kind': 'authentication',
+          'order': 0,
+          'default': 'user',
+          'description': 'Credentials used for reading data.'
+        }
+      },
       'from': {
         'bucket': {
           'field': {
             'name': 'bucket',
             'kind': 'string',
-            'order': 1,
+            'order': 2,
             'default': '',
             'description': 'Name of bucket where DT files are stored.'
           }
@@ -76,7 +86,7 @@ TASKS = [
           'field': {
             'name': 'paths',
             'kind': 'string_list',
-            'order': 2,
+            'order': 3,
             'default': [
             ],
             'description': 'List of prefixes to pull specific DT files.'
@@ -86,7 +96,7 @@ TASKS = [
           'field': {
             'name': 'days',
             'kind': 'integer',
-            'order': 3,
+            'order': 4,
             'default': 2,
             'description': 'Number of days back to synchronize.'
           }
@@ -95,19 +105,27 @@ TASKS = [
           'field': {
             'name': 'hours',
             'kind': 'integer',
-            'order': 3,
+            'order': 5,
             'default': 0,
             'description': 'Number of hours back to synchronize.'
           }
         }
       },
       'to': {
-        'auth': 'service',
+        'auth': {
+          'field': {
+            'name': 'auth_write',
+            'kind': 'authentication',
+            'order': 1,
+            'default': 'service',
+            'description': 'Credentials used for writing data.'
+          }
+        },
         'dataset': {
           'field': {
             'name': 'dataset',
             'kind': 'string',
-            'order': 3,
+            'order': 6,
             'default': '',
             'description': 'Existing dataset in BigQuery.'
           }

@@ -21,7 +21,7 @@
 
 Meant to speed up an automate testing of StarThinker.
 
-To initialize: python tests/helper.py --init
+To configure: python tests/helper.py --config
 To run all: python tests/helper.py
 To run some: python tests/helper.py --tests dt entity
 
@@ -36,7 +36,7 @@ import json
 from time import sleep
 
 from starthinker.config import UI_ROOT, UI_SERVICE, UI_PROJECT
-from starthinker.script.parse import json_get_fields, json_set_fields, json_expand_includes
+from starthinker.script.parse import json_get_fields, json_set_fields
 from starthinker.util.project import get_project
 
 CONFIG_FILE = UI_ROOT + '/tests/config.json'
@@ -44,6 +44,26 @@ TEST_DIRECTORY = UI_ROOT + '/tests/scripts/'
 RECIPE_DIRECTORY = UI_ROOT + '/tests/recipes/'
 LOG_DIRECTORY = UI_ROOT + '/tests/logs/'
 RE_TEST = re.compile(r'test.*\.json')
+
+
+def json_expand_includes(script):
+  expanded_tasks = []
+  for task in script['tasks']:
+    function, parameters = next(iter(task.items()))
+
+    if function == 'include':
+      tasks = get_project(UI_ROOT + '/' + parameters['script'])['tasks']
+      json_set_fields(tasks, parameters['parameters'])
+      for t in tasks:
+        function, parameters = next(iter(t.items()))
+        expanded_tasks.append({function:parameters})
+
+    else:
+      expanded_tasks.append({function:parameters})
+
+  script['tasks'] = expanded_tasks
+
+  return script
 
 
 def load_tests():
@@ -54,7 +74,7 @@ def load_tests():
         yield filename, get_project(TEST_DIRECTORY + filename)
 
 
-def initialize_tests(scripts, tests):
+def configure_tests(scripts, tests):
   """Initialize all the necessary test files for Starthinker
   
   Args:
@@ -210,22 +230,41 @@ def run_tests(scripts, recipes, tests):
   print("")
 
 
+def generate_include(script_file):
+  script = get_project(script_file)
+
+  # parse fields and constants into parameters
+  print('    { "include":{')
+  print('      "script":"%s",' % script_file)
+  print('      "parameters":{')
+  print(',\n'.join(['        "%s":{"field":{ "name":"%s", "kind":"%s", "description":"%s" }}' % (field['name'], field['name'], field['kind'], field.get('description', '')) for field in json_get_fields(script)]))
+  print('      }')
+  print('    }}')
+  print ('')
+
+
 def tests():
   parser = argparse.ArgumentParser()
-  parser.add_argument('-i', '--init', help='Initialize test config.json only.', action='store_true')
+  parser.add_argument('-c', '--configure', help='Configure test config.json only.', action='store_true')
   parser.add_argument('-t', '--tests', nargs='*', help='Run only these tests, name of test from scripts without .json part.')
+  parser.add_argument('-i', '--include', help='Create an include file for the script, used in tests.', default=None)
 
   args = parser.parse_args()
-  scripts = list(load_tests())
-  tests = [t.split('.')[0] for t in (args.tests or [])]
 
   print("")
 
-  if args.init:
-    initialize_tests(scripts, tests)
+  if args.include:
+    generate_include(args.include)
+
   else:
-    recipes = initialize_tests(scripts, tests)
-    run_tests(scripts, recipes, tests)
+    scripts = list(load_tests())
+    tests = [t.split('.')[0] for t in (args.tests or [])]
+
+    if args.configure:
+      configure_tests(scripts, tests)
+    else:
+      recipes = configure_tests(scripts, tests)
+      run_tests(scripts, recipes, tests)
 
 
 if __name__ == "__main__":

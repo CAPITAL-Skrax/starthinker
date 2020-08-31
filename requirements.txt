@@ -16,7 +16,7 @@
 #
 ###########################################################################
 
-#-r starthinker/requirements.txt
+# starthinker
 google-api-python-client
 google-auth
 google-auth-oauthlib
@@ -33,7 +33,7 @@ py-xlsx
 simple-salesforce
 smartsheet-python-sdk
 
-#-r starthinker_ui/requirements.txt
+# starthinker_ui
 wheel
 gunicorn
 uwsgi

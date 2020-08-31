@@ -7,6 +7,9 @@ All StarThinker recipes and solutions can be run from [Google Collaboratory](htt
 * [Archive](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/archive.ipynb) - Wipe old information from a Storage bucket based on last update time.
 * [DV360 Audience Analysis](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/audience_analysis.ipynb) - The Audience Wizard Dashboard helps you to track the audience performance across all audiences on Display.
 * [CM User Audit](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/barnacle.ipynb) - Gives CM clients ability to see which profiles have access to which parts of an account. Loads CM user profile mappings using the API into BigQuery and connects to a DataStudio dashboard.
+* [Census Data Correlation](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_census_correlate.ipynb) - Correlate another table with US Census data.  Expands a data set dimensions by finding population segments that correlate with the master table.
+* [Census Data Normalized](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_census_normalize.ipynb) - Convert given census table to percent of population, normalizing it.
+* [Pearson Correlation Significance Function](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_pearson_significance.ipynb) - Add function to dataset for checking if correlation is significant.
 * [Query To Table](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_query.ipynb) - Save query results into a BigQuery table.
 * [Query Run](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_run_query.ipynb) - Run query on a project.
 * [Storage To Table](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/bigquery_storage.ipynb) - Move using bucket and path prefix.
@@ -42,11 +45,13 @@ All StarThinker recipes and solutions can be run from [Google Collaboratory](htt
 * [Email Fetch](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/email_to_bigquery.ipynb) - Import emailed CM report, Dv360 report, csv, or excel into a BigQuery table.
 * [Entity Read Files](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/entity.ipynb) - Import public and private <a href='https://developers.google.com/bid-manager/guides/entity-read/format-v2' target='_blank'>Entity Read Files</a> into a BigQuery dataset.<br/>CAUTION: PARTNER ONLY, ADVERTISER FILTER IS NOT APPLIED.
 * [Floodlight Monitor](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/floodlight_monitor.ipynb) - Monitor floodlight impressions specified in sheet and send email alerts.
+* [Federal Reserve Regional Data](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/fred_regional_to_bigquery.ipynb) - Download federal reserve region.
+* [Federal Reserve Series Data](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/fred_series_to_bigquery.ipynb) - Download federal reserve series.
 * [Google Analytics Timeline](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/ga_timeline.ipynb) - Download Google Analytics settings to a BigQuery table.
 * [API To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/google_api_to_bigquery.ipynb) - Execute a Google API function and store results to BigQuery.
 * [Say Hello](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/hello.ipynb) - Recipe template for say hello.
 * [Project IAM](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/iam.ipynb) - Sets project permissions for an email.
-* [Browser Activity Dashboard ( 2019 )](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/itp.ipynb) - Visualizes a client's Campaign Manager and DV360 activity by browser and device
+* [ITP Audit Dashboard ( 2020 )](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/itp_audit.ipynb) - Dashboard that shows performance metrics across browser to see the impact of ITP.
 * [Tag Key Value Uploader](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/kv_uploader.ipynb) - A tool for bulk editing key value pairs for CM placements.
 * [Line Item To BigQuery Via Query](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/lineitem_read_to_bigquery_via_query.ipynb) - Move using an Id query.
 * [Line Item To BigQuery Via Values](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/lineitem_read_to_bigquery_via_value.ipynb) - Move using hard coded Id values.
@@ -55,12 +60,14 @@ All StarThinker recipes and solutions can be run from [Google Collaboratory](htt
 * [Column Mapping](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/mapping.ipynb) - Use sheet to define keyword to column mappings.
 * [Monthly Budget Mover](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/monthly_budget_mover.ipynb) - Apply the previous month's budget/spend delta to the current month.  Aggregate up the budget and spend from the previous month of each category declared then apply the delta of the spend and budget equally to each Line Item under that Category.
 * [PoliceBot](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/policebot.ipynb) - A tool that helps enforce CM object name conventions by checking names against a set of client-defined patterns, and emailing violations to appropriate agency teams on a daily basis.
+* [SA360 Web Query Report](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/sa360_web_query.ipynb) - Download SA360 reports into a Google Sheet.
 * [Salesforce To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/salesforce_to_bigquery.ipynb) - Move query results into a BigQuery table.
 * [SDF Download](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/sdf_to_bigquery.ipynb) - Download SDF reports into a BigQuery table.
 * [Sheet Clear](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/sheets_clear.ipynb) - Clear data from a sheet.
 * [Sheet Copy](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/sheets_copy.ipynb) - Copy tab from a sheet to a sheet.
 * [Sheet To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/sheets_to_bigquery.ipynb) - Import data from a sheet and move it to a BigQuery table.
-* [SmartSheet To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/smartsheet_to_bigquery.ipynb) - Move sheet data into a BigQuery table.
+* [SmartSheet Report To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/smartsheet_report_to_bigquery.ipynb) - Move report data into a BigQuery table.
+* [SmartSheet Sheet To BigQuery](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/smartsheet_to_bigquery.ipynb) - Move sheet data into a BigQuery table.
 * [Test Script](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/test.ipynb) - Used by tests.
 * [Transparency Dashboard](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/transparency.ipynb) - Reports the percentage of CM impressions that can be attributed to a specific domain or application.  Allows diagnostic of which domains and apps are misconfigured by publisher resulting in underreporting.
 * [Trends Places To BigQuery Via Query](https://colab.research.google.com/github/google/starthinker/blob/master/colabs/trends_places_to_bigquery_via_query.ipynb) - Move using a WOEID query.
